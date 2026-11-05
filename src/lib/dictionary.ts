@@ -1,4 +1,5 @@
 import { CURATED_THEMES } from './curatedThemes';
+import { COMMON_WORDS } from './wordBank';
 
 // Popular 5-letter words for Daily Classic Wordle
 export const CLASSIC_WORD_LIST: string[] = [
@@ -30,19 +31,56 @@ CURATED_THEMES.forEach(t => {
   t.words.forEach(w => THEME_WORDS_SET.add(w.toUpperCase()));
 });
 
-// A robust set of common 3 to 8 letter English words
-import { COMMON_WORDS } from './wordBank';
+let EXTENDED_WORDS_SET: Set<string> | null = null;
+
+// Initialize the 115,000+ word dictionary in background
+export async function initDictionary(): Promise<void> {
+  if (EXTENDED_WORDS_SET) return;
+  try {
+    if (typeof window !== 'undefined') {
+      const res = await fetch('/words.txt');
+      if (res.ok) {
+        const text = await res.text();
+        const set = new Set<string>();
+        const lines = text.split('\n');
+        for (let i = 0; i < lines.length; i++) {
+          const w = lines[i].trim().toUpperCase();
+          if (w) set.add(w);
+        }
+        EXTENDED_WORDS_SET = set;
+      }
+    } else {
+      // Server-side
+      const fs = await import('fs');
+      const path = await import('path');
+      const filePath = path.join(process.cwd(), 'public', 'words.txt');
+      if (fs.existsSync(filePath)) {
+        const text = fs.readFileSync(filePath, 'utf-8');
+        const set = new Set<string>();
+        const lines = text.split('\n');
+        for (let i = 0; i < lines.length; i++) {
+          const w = lines[i].trim().toUpperCase();
+          if (w) set.add(w);
+        }
+        EXTENDED_WORDS_SET = set;
+      }
+    }
+  } catch (err) {
+    console.warn('Could not load extended dictionary:', err);
+  }
+}
 
 export function isValidWord(word: string): boolean {
   const upper = word.toUpperCase();
   if (THEME_WORDS_SET.has(upper)) return true;
   if (CLASSIC_WORD_LIST.includes(upper)) return true;
-  return COMMON_WORDS.has(upper);
+  if (COMMON_WORDS.has(upper)) return true;
+  if (EXTENDED_WORDS_SET && EXTENDED_WORDS_SET.has(upper)) return true;
+  return false;
 }
 
 // Daily Word Generator based on UTC date
 export function getDailyClassicWord(date: Date = new Date()): { word: string; puzzleNumber: number } {
-  // Epoch: Jan 1, 2026
   const epoch = new Date(Date.UTC(2026, 0, 1)).getTime();
   const current = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())).getTime();
   const daysSinceEpoch = Math.max(0, Math.floor((current - epoch) / (1000 * 60 * 60 * 24)));

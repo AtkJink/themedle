@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { GameMode, WordTheme, UserStats, GameSettings } from '@/lib/types';
-import { isValidWord, getDailyClassicWord } from '@/lib/dictionary';
+import { isValidWord, getDailyClassicWord, initDictionary } from '@/lib/dictionary';
 import { getRandomCuratedTheme } from '@/lib/curatedThemes';
 import { getKeyStatuses, loadUserStats, saveUserStats, getDefaultStats } from '@/lib/gameEngine';
 import { Header } from '@/components/Header';
@@ -66,6 +66,7 @@ export default function HomePage() {
   // Load stats and settings on mount
   useEffect(() => {
     setMounted(true);
+    initDictionary();
     setStats(loadUserStats());
     setDailyWordData(getDailyClassicWord(new Date()));
 
