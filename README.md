@@ -55,12 +55,18 @@ Because this is a standard Next.js App Router project, you can deploy it for fre
    ```bash
    git add .
    git commit -m "feat: initial commit of Themedle"
-   git remote add origin https://github.com/w1ll0w/<your-repo-name>.git
-   git push -u origin master
+   git remote add origin https://github.com/AtkJink/themedle.git
+   git push -u origin main
    ```
 
 2. **Deploy on Vercel**:
    - Go to [vercel.com](https://vercel.com) and sign in with GitHub.
-   - Click **"Add New"** > **"Project"** and import your repository.
+   - Click **"Add New"** > **"Project"** and import `themedle`.
    - In **Environment Variables**, add `GEMINI_API_KEY` (from [Google AI Studio](https://aistudio.google.com/app/apikey)).
    - Click **Deploy**. Vercel will build and host your game with a free `.vercel.app` domain and automatic continuous deployment on every Git push.
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).
